@@ -21,11 +21,14 @@ impl DnsServer {
                 Ok((size, source)) => {
                     println!("Received {} bytes from {}", size, source);
                     let mut response = vec![];
-                    let header: [u8; 12] = [0x04, 0xd2, 0x80, 0, 0, 1, 0, 0, 0, 0, 0, 0];
+                    let header: [u8; 12] = [0x04, 0xd2, 0x80, 0, 0, 1, 0, 1, 0, 0, 0, 0];
                     let question = b"\x0ccodecrafters\x02io\x00\x00\x01\x00\x01";
+                    let answer =
+                        b"\x0ccodecrafters\x02io\x00\x00\x01\x00\x01\x00\x01\x00\x01\x00\x04\x08\x08\x08\x08";
 
                     response.extend_from_slice(&header);
                     response.extend_from_slice(question);
+                    response.extend_from_slice(answer);
 
                     udp_socket
                         .send_to(&response, source)
