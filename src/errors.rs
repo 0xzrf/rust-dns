@@ -10,8 +10,11 @@ pub enum DnsErrors {
     #[error("Error receiving packet: {error}")]
     ErrorReceivingPacket { error: String },
 
-    #[error("Invalid Question section format")]
-    InvalidQuestionSection,
+    #[error("Invalid Question section format: {reason}")]
+    InvalidQuestionSection { reason: String },
+
+    #[error("Invalid Question section format: {reason}")]
+    InvalidHeaderSection { reason: String },
 }
 
 impl DnsErrors {

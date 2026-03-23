@@ -1,6 +1,5 @@
 use crate::errors::DnsResult;
 use crate::{Header, types::Question};
-use bytes::{Buf, BufMut, Bytes, BytesMut};
 
 pub struct DnsMessage {
     header: Header,
@@ -9,8 +8,9 @@ pub struct DnsMessage {
 
 impl DnsMessage {
     pub fn build_message(query: &[u8]) -> DnsResult<Self> {
-        let header = &query[0..12];
+        let header = Header::new(query)?;
+        let question = Question::new(query)?;
 
-        todo!()
+        Ok(DnsMessage { header, question })
     }
 }

@@ -1,4 +1,3 @@
-use anyhow::Context;
 use bytes::Buf;
 
 use crate::{DnsErrors, DnsResult};
@@ -33,7 +32,9 @@ impl Question {
         }
 
         if data.get_u8() != 0x00 {
-            return Err(DnsErrors::InvalidQuestionSection);
+            return Err(DnsErrors::InvalidQuestionSection {
+                reason: "Invalid null byte".to_string(),
+            });
         }
 
         let q_type = data.get_i16().to_le();
@@ -86,5 +87,18 @@ pub mod test_question_section {
                 panic!();
             }
         }
+    }
+
+    #[test]
+    pub fn test_fail_on_invalid_data() {
+        let data = b"\x06google\x03com\x01\x01\x00\x01";
+        let question_create_result = Question::new(data);
+        assert!(question_create_result.is_err(), "expected this to fail");
+        assert_eq!(
+            DnsErrors::InvalidQuestionSection {
+                reason: "Invalid null byte".to_string()
+            },
+            question_create_result.err().unwrap()
+        );
     }
 }
