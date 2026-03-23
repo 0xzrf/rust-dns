@@ -3,10 +3,10 @@ use bytes::Buf;
 use crate::{DnsErrors, DnsResult};
 
 pub struct Question {
-    second_ld: Vec<u8>,
-    top_ld: Vec<u8>, // ld== level domain
-    q_type: i16,
-    class: i16,
+    pub second_ld: Vec<u8>,
+    pub top_ld: Vec<u8>, // ld== level domain
+    pub q_type: i16,
+    pub class: i16,
 }
 
 impl Question {
@@ -55,7 +55,7 @@ pub mod test_question_section {
 
     #[test]
     pub fn test_passes_if_data_correct() {
-        let data = b"\x06google\x03com\x00\x00\x01\x00\x01";
+        let data = b"\x0ccodecrafters\x02io\x00\x00\x01\x00\x01";
 
         match Question::new(data) {
             Ok(question) => {
@@ -76,8 +76,12 @@ pub mod test_question_section {
 
                 println!("top ld: {top_ld}\nsecond_ld: {second_ld}");
 
-                assert_eq!("google".to_string(), second_ld, "Invalid second ld val");
-                assert_eq!("com".to_string(), top_ld, "Invalid second ld val");
+                assert_eq!(
+                    "codecrafters".to_string(),
+                    second_ld,
+                    "Invalid second ld val"
+                );
+                assert_eq!("io".to_string(), top_ld, "Invalid second ld val");
 
                 assert_eq!(q_type, 1, "q_type has invalid value");
                 assert_eq!(class, 1, "class has invalid value ");
@@ -101,4 +105,7 @@ pub mod test_question_section {
             question_create_result.err().unwrap()
         );
     }
+
+    #[test]
+    pub fn something() {}
 }
