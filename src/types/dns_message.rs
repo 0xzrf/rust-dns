@@ -35,15 +35,21 @@ impl DnsMessage {
             .with_arcount(1);
 
         let mut question_response: Vec<u8> = vec![];
-        question_response.extend(query_question.second_ld.clone()); // mimic the labels
-        question_response.extend(query_question.top_ld.clone());
-        question_response.extend(0x00u8.to_le_bytes()); // add null byte
+        let mut labels = vec![];
+        for (label_len, label) in &query_question.labels {
+            let mut input_bytes = vec![*label_len as u8];
+
+            input_bytes.extend_from_slice(label);
+            labels.extend(input_bytes);
+        }
+        labels.extend((0u8).to_be_bytes());
+
+        question_response.extend_from_slice(&labels);
         question_response.extend((1u16).to_be_bytes());
         question_response.extend((1u16).to_be_bytes());
 
         let mut answer_response: Vec<u8> = vec![];
-        answer_response.extend(query_question.second_ld.clone()); // mimic the labels
-        answer_response.extend(query_question.top_ld.clone());
+        answer_response.extend_from_slice(&labels);
         answer_response.extend((1u16).to_be_bytes()); // "A" record type
         answer_response.extend((1u16).to_be_bytes()); // "IN" record class
         answer_response.extend((60u32).to_be_bytes()); // TTL
