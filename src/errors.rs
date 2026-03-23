@@ -1,4 +1,3 @@
-use anyhow::Result;
 use thiserror::Error;
 
 pub type DnsResult<T> = Result<T, DnsErrors>;
