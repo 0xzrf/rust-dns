@@ -17,17 +17,25 @@ impl Question {
 
         let mut labels = vec![];
 
-        while data[data_ix] != 0 {
-            let label_len = data[data_ix] as usize;
+        loop {
+            let byte = data[data_ix];
+            if byte != 0 {
+                let label_len = data[data_ix] as usize;
 
-            let label_data = data
-                .get(data_ix + 1..(data_ix + 1 + label_len))
-                .unwrap()
-                .to_vec();
+                let label_data = data
+                    .get(data_ix + 1..(data_ix + 1 + label_len))
+                    .unwrap()
+                    .to_vec();
 
-            labels.push((label_len, label_data));
+                labels.push((label_len, label_data));
 
-            data_ix += label_len + 1;
+                data_ix += label_len + 1;
+            } else if byte & 0b1100_0000 == 0b1100_0000 {
+                let offset =
+                    (((data[data_ix] & 0b0011_1111) as u16) << 8) | data[data_ix + 1] as u16;
+            } else {
+                break;
+            }
         }
 
         let mut remaining_metadata = data.get(data_ix + 1..).unwrap();
