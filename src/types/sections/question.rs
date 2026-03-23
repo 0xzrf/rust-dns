@@ -36,8 +36,8 @@ impl Question {
             return Err(DnsErrors::InvalidQuestionSection);
         }
 
-        let q_type = data.get_i16();
-        let class = data.get_i16();
+        let q_type = data.get_i16().to_le();
+        let class = data.get_i16().to_le();
 
         Ok(Self {
             second_ld,
