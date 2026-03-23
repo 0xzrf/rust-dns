@@ -1,9 +1,10 @@
 use codecrafters_dns_server::run_dns_server;
-use std::net::UdpSocket;
 
 fn main() {
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
-    println!("Logs from your program will appear here!");
+    if let Err(e) = run_dns_server() {
+        eprint!("{}", e.error_msg());
+        std::process::exit(1);
+    }
 
-    run_dns_server();
+    std::process::exit(0);
 }

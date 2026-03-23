@@ -13,21 +13,23 @@ impl DnsServer {
         Ok(Self { socket })
     }
 
-    pub fn handle_request(&self) {
+    pub fn handle_request(&self) -> DnsResult<()> {
         let mut buf = [0; BUFFER_MAX_LEN];
         let udp_socket = &self.socket;
         loop {
             match udp_socket.recv_from(&mut buf) {
                 Ok((size, source)) => {
                     println!("Received {} bytes from {}", size, source);
-                    let response = [];
+                    let response: [u8; 12] = [0x04, 0xd2, 0x80, 0, 0, 0, 0, 0, 0, 0, 0, 0];
                     udp_socket
                         .send_to(&response, source)
                         .expect("Failed to send response");
                 }
                 Err(e) => {
                     eprintln!("Error receiving data: {}", e);
-                    break;
+                    return Err(DnsErrors::ErrorReceivingPacket {
+                        error: e.to_string(),
+                    });
                 }
             }
         }
