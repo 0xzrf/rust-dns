@@ -1,6 +1,8 @@
 use crate::{BUFFER_MAX_LEN, DnsErrors, DnsResult};
 use std::net::UdpSocket;
 
+use super::dns_message::DnsMessage;
+
 pub struct DnsServer {
     pub socket: UdpSocket,
 }
@@ -19,16 +21,8 @@ impl DnsServer {
         loop {
             match udp_socket.recv_from(&mut buf) {
                 Ok((size, source)) => {
-                    println!("Received {} bytes from {}", size, source);
-                    let mut response = vec![];
-                    let header: [u8; 12] = [0x04, 0xd2, 0x80, 0, 0, 1, 0, 1, 0, 0, 0, 0];
-                    let question = b"\x0ccodecrafters\x02io\x00\x00\x01\x00\x01";
-                    let answer =
-                        b"\x0ccodecrafters\x02io\x00\x00\x01\x00\x01\x00\x01\x00\x01\x00\x04\x08\x08\x08\x08";
-
-                    response.extend_from_slice(&header);
-                    response.extend_from_slice(question);
-                    response.extend_from_slice(answer);
+                    let query_dns_msg = DnsMessage::build_query(&buf)?;
+                    let response = query_dns_msg.build_response()?;
 
                     udp_socket
                         .send_to(&response, source)

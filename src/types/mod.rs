@@ -5,4 +5,3 @@ pub mod sections;
 pub use sections::{Header, Question};
 
 mod dns_message;
-pub mod header;

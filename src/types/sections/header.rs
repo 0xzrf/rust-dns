@@ -1,22 +1,19 @@
-use crate::errors::{DnsErrors, DnsResult};
-use bytes::Buf;
+use modular_bitfield_msb::{BitfieldSpecifier, bitfield, specifiers::*};
 
-pub struct Header([u8; 12]);
-
-impl Header {
-    pub fn new(mut data: &[u8]) -> DnsResult<Header> {
-        let mut header_inner = Vec::with_capacity(12);
-        for _ in 0..12 {
-            let header_data = data.get_u8();
-            header_inner.push(header_data);
-        }
-
-        if data.len() != 12 {
-            return Err(DnsErrors::InvalidQuestionSection {
-                reason: "Invalid data len".to_string(),
-            });
-        }
-
-        Ok(Self(data.try_into().unwrap()))
-    }
+#[bitfield(bytes = 12)]
+#[derive(BitfieldSpecifier, Debug)]
+pub struct Header {
+    pub id: B16,
+    pub qr: bool,
+    pub opcode: B4,
+    pub aa: bool,
+    pub tc: bool,
+    pub rd: bool,
+    pub ra: bool,
+    pub z: B3,
+    pub rcode: B4,
+    pub qdcount: B16,
+    pub ancount: B16,
+    pub nscount: B16,
+    pub arcount: B16,
 }
