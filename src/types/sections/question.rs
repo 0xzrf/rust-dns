@@ -13,32 +13,24 @@ impl Question {
     ///
     /// Panics if data.get_u8() fails
     pub fn new(data: &[u8]) -> DnsResult<Self> {
-        let mut data_ix = 0usize;
+        let mut pointer = 0usize;
 
         let mut labels = vec![];
 
-        loop {
-            let byte = data[data_ix];
-            if byte != 0 {
-                let label_len = data[data_ix] as usize;
+        while data[pointer] != 0 {
+            let label_len = data[pointer] as usize;
 
-                let label_data = data
-                    .get(data_ix + 1..(data_ix + 1 + label_len))
-                    .unwrap()
-                    .to_vec();
+            let label_data = data
+                .get(pointer + 1..(pointer + 1 + label_len))
+                .unwrap()
+                .to_vec();
 
-                labels.push((label_len, label_data));
+            labels.push((label_len, label_data));
 
-                data_ix += label_len + 1;
-            } else if byte & 0b1100_0000 == 0b1100_0000 {
-                let offset =
-                    (((data[data_ix] & 0b0011_1111) as u16) << 8) | data[data_ix + 1] as u16;
-            } else {
-                break;
-            }
+            pointer += label_len + 1;
         }
 
-        let mut remaining_metadata = data.get(data_ix + 1..).unwrap();
+        let mut remaining_metadata = data.get(pointer + 1..).unwrap();
 
         let q_type = remaining_metadata.get_i16();
         let class = remaining_metadata.get_i16();
